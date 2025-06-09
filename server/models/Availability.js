@@ -28,7 +28,7 @@ class Availability {
             availabilityData;
 
         const query = `
-            INSERT INTO availability (business_id, day_of_week, mroning_available, afternoon_available, evening_available)
+            INSERT INTO availability (business_id, day_of_week, morning_available, afternoon_available, evening_available)
             VALUES ($1, $2, $3, $4, $5)
             ON CONFLICT (business_id, day_of_week)
             DO UPDATE SET

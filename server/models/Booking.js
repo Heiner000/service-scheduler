@@ -48,17 +48,17 @@ class Booking {
         let paramCount = 1;
 
         // filter by specific date if provided
-        if (filters.date) {
+        if (filter.date) {
             paramCount++;
             query += ` AND booking_date = $${paramCount}`;
-            values.push(filters.date);
+            values.push(filter.date);
         }
 
         // filter by status if provided
-        if (filters.status) {
+        if (filter.status) {
             paramCount++;
             query += ` AND status = $${paramCount}`;
-            values.push(filters.status);
+            values.push(filter.status);
         }
 
         // order the results chronologically by date & time

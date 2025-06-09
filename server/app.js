@@ -80,9 +80,9 @@ app.get("/health", (req, res) => {
     });
 });
 
-// app.use('/api/bookings', require('./routes/bookings'));
+app.use("/api/bookings", require("./routes/bookings"));
 // app.use('/api/businesses', require('./routes/businesses'));
-// app.use('/api/availability', require('./routes/availability'));
+app.use("/api/availability", require("./routes/availability"));
 
 // error handling
 app.use((err, req, res, next) => {
@@ -97,7 +97,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handling
-app.use("*", (req, res) => {
+app.use((req, res) => {
     res.status(404).json({
         error: "Route not found",
         path: req.originalUrl,
@@ -113,7 +113,7 @@ const startServer = async () => {
         console.log("Seeding initial data . . . ");
         await seedInitialData();
 
-        app.listi(PORT, () => {
+        app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT} `);
             console.log(
                 `📊 Environment: ${process.env.NODE_ENV || "development"}`
