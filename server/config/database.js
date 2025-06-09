@@ -10,7 +10,7 @@ const pool = new Pool({
             : false,
 });
 
-// log for successful DB connection
+// test db connection
 pool.on("connect", () => {
     console.log("Connected to PostgreSQL database ....");
 });
@@ -24,6 +24,7 @@ pool.on("error", (err) => {
 // create required tables if they don't already exist
 const initializeDatabase = async () => {
     try {
+        console.log(" . . . creating businesses table . . . ");
         // create 'businesses' table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS businesses (
@@ -32,11 +33,12 @@ const initializeDatabase = async () => {
                 owner_name VARCHAR(255) NOT NULL,
                 email VARCHAR(255) UNIQUE NOT NULL,
                 phone VARCHAR(20),
-                service_types JSONB DEFAULT '[]',
+                service_types JSONB DEFAULT '[]'::jsonb,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
+            );
         `);
 
+        console.log(" . . . creating availability table . . . ");
         // create 'availability' table to track business working hours per weekday
         await pool.query(`
             CREATE TABLE IF NOT EXISTS availability (
@@ -46,10 +48,11 @@ const initializeDatabase = async () => {
                 morning_available BOOLEAN DEFAULT true,
                 afternoon_available BOOLEAN DEFAULT true,
                 evening_available BOOLEAN DEFAULT true,
-                UNIQUE(business_id, day_of_week
-            )
+                UNIQUE(business_id, day_of_week)
+            );
         `);
 
+        console.log(" . . . creating bookings table . . . ");
         // creates 'bookings' table for customer appointments, linked to businesses
         // includes status & time slot checks for data consistency
         await pool.query(`
@@ -66,7 +69,7 @@ const initializeDatabase = async () => {
                 service_description TEXT,
                 status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
+            );
         `);
 
         console.log("Database tables initialized successfully!!");
@@ -90,7 +93,7 @@ const seedInitialData = async () => {
             // insert the business and return its generated ID
             const businessResult = await pool.query(
                 `
-                INSERT INTO business (business_name, owner_name, email, phone, service_types)
+                INSERT INTO businesses (business_name, owner_name, email, phone, service_types)
                 VALUES ($1, $2, $3, $4, $5)
                 RETURNING id
                 `,

@@ -21,10 +21,10 @@ async function testDatabaseSetup() {
 
         // test business model
         const businesses = await Business.getAll();
-        console.log(` ✅ ... Found ${business.length} business(es)`);
+        console.log(` ✅ ... Found ${businesses.length} business(es)`);
 
         if (businesses.length > 0) {
-            const business = business[0];
+            const business = businesses[0];
             console.log(` 📊 ... Business: ${business.business_name}`);
             console.log(` 📧 ... Email: ${business.email}`);
             console.log(
