@@ -81,7 +81,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/bookings", require("./routes/bookings"));
-// app.use('/api/businesses', require('./routes/businesses'));
+app.use("/api/businesses", require("./routes/businesses"));
 app.use("/api/availability", require("./routes/availability"));
 
 // error handling
