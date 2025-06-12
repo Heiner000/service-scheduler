@@ -18,7 +18,7 @@ const AppState = {
     currentStep: 1,
     selectedService: null,
     selectedDate: null,
-    selectedTimeslot: null,
+    selectedTimeSlot: null,
     availableDates: [],
     serviceTypes: [],
     isLoading: false,
@@ -372,12 +372,125 @@ function resetTimeSlots() {
         slotTime.classList.remove("text-gray-600");
     });
 
-    AppState.selectedTimeslot = null;
+    AppState.selectedTimeSlot = null;
     validateForm();
 }
 
 // FORM VALIDATION
 // =======================================
+
+/**
+ * validate form & enable/disable submit button
+ */
+function validateForm() {
+    const formData = new FormData(Elements.form);
+
+    // require fields
+    const requiredFields = [
+        "service_type",
+        "booking_date",
+        "time_slot",
+        "customer_name",
+        "customer_email",
+    ];
+
+    const isValid = requiredFields.every((field) => {
+        const value = formData.get(field);
+        return value && value.trim() !== "";
+    });
+
+    // email validation
+    const email = formData.get("customer_email");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = !email || emailRegex.test(email);
+
+    const canSubmit = isValid && isEmailValid && !AppState.isLoading;
+
+    Elements.submitBtn.disabled = !canSubmit;
+
+    // update progress
+    let step = 1;
+    if (formData.get("service_type")) step = 2;
+    if (formData.get("booking_date") && formData.get("time_slot")) step = 3;
+
+    if (step !== AppState.currentStep) {
+        AppState.currentStep = step;
+        updateProgress(step);
+    }
+
+    return canSubmit;
+}
+
+/**
+ * Handle service selection
+ */
+function handleServiceSelection(event) {
+    const selectedService = event.target.value;
+    AppState.selectedService = selectedService;
+
+    if (selectedService) {
+        // load available dates for this service
+        loadAvailableDates();
+        hideMessage(); // clears previous error messages
+    } else {
+        // reset form if no service selected
+        Elements.dateSelect.disabled = true;
+        Elements.dateSelect.innerHTML =
+            '<option value="">Select a service first</option>';
+        resetTimeSlots();
+        AppState.selectedDate = null;
+    }
+
+    validateForm();
+}
+
+/**
+ * Handle data selection
+ */
+function handleDateSelection(event) {
+    const selectedDate = event.target.value;
+    AppState.selectedDate = selectedDate;
+
+    if (selectedDate) {
+        // load available dates for this service
+        loadTimeSlots(selectedDate);
+        hideMessage(); // clear any previous error messages
+    } else {
+        // reset form if no service selected
+        Elements.dateSelect.disabled = true;
+        Elements.dateSelect.innerHTML =
+            '<option value="">Select a service first</option>';
+        resetTimeSlots();
+        AppState.selectedDate = null;
+    }
+
+    validateForm();
+}
+
+/**
+ * Handle date selection
+ */
+function handleDateSelection(event) {
+    const selectedDate = event.target.value;
+    AppState.selectedDate = selectedDate;
+
+    if (selectedDate) {
+        loadTimeSlots(selectedDate);
+        hideMessage(); // clear any previous error messages
+    } else {
+        resetTimeSlots();
+    }
+
+    validateForm();
+}
+
+/**
+ * Handle time slot selection
+ */
+function handleTimeSlotSelection(event) {
+    AppState.selectedTimeSlot = event.target.value;
+    validateForm();
+}
 
 // FORM SUBMISSION
 // =======================================
