@@ -495,6 +495,79 @@ function handleTimeSlotSelection(event) {
 // FORM SUBMISSION
 // =======================================
 
+/**
+ * Submit booking form
+ */
+async function handleFormSubmission(event) {
+    event.preventDefault();
+
+    if (!validateForm()) {
+        showError("Please fill in all required fields correctly");
+        return;
+    }
+
+    try {
+        // show loading state
+        Elements.loadingOverlay.classList.remove("hidden");
+        Elements.submitSpinner.classList.remove("hidden");
+        Elements.submitText.textContent = "Creating booking. . .";
+        showLoading(Elements.submitBtn);
+
+        // prepare form data
+        const formData = new FormData(Elements.form);
+        const bookingData = {
+            business_id: CONFIG.BUSINESS_ID,
+            customer_name: formData.get("customer_name").trim(),
+            customer_email: formData.get("customer_email").trim(),
+            customer_phone: formData.get("customer_phone")?.trim() || null,
+            customer_address: formData.get("customer_address")?.trim() || null,
+            service_type: formData.get("service_type"),
+            booking_date: formData.get("booking_date"),
+            time_slot: formData.get("time_slot"),
+            service_description:
+                formData.get("service_description")?.trim() || null,
+        };
+
+        // submit to API
+        const response = await apiRequest(CONFIG.ENDPOINTS.CREATE_BOOKING, {
+            method: "POST",
+            body: JSON.stringify(bookingData),
+        });
+
+        // success msg
+        showSuccess(
+            `Booking created successfully! Your appointment is scheduled for ${formatDateForDisplay(
+                bookingData.booking_date
+            )} during the ${
+                bookingData.time_slot
+            }. You'll receive a confirmation email shortly.`
+        );
+
+        // reset form
+        Elements.form.reset();
+        AppState.selectedService = null;
+        AppState.selectedDate = null;
+        AppState.selectedTimeSlot = null;
+        Elements.dateSelect.disabled = true;
+        resetTimeSlots();
+        updateProgress(1);
+
+        // scroll to success message
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        console.error("Booking submission failed: ", error);
+        showError(
+            error.message || "Failed to create booking. Please try again."
+        );
+    } finally {
+        // hide loading state
+        Elements.loadingOverlay.classList.add("hidden");
+        Elements.submitSpinner.classList.add("hidden");
+        Elements.submitText.textContent = "Complete Form";
+        hideLoading(Elements.submitBtn);
+    }
+}
+
 // INITIALIZATION
 // =======================================
 
