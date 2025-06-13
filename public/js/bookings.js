@@ -3,7 +3,7 @@
 
 // config & constants
 const CONFIG = {
-    API_BASE: "/",
+    API_BASE: "/api",
     BUSINESS_ID: 1,
     ENDPOINTS: {
         SERVICES: "/businesses/{businessId}/services",
@@ -49,6 +49,7 @@ const Elements = {
 async function apiRequest(endpoint, options = {}) {
     try {
         const url = CONFIG.API_BASE + endpoint;
+        console.log("Making API request to:", url);
         const response = await fetch(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -85,10 +86,13 @@ function showLoading(element = null, text = "Loading. . .") {
 /**
  * Hide loading state
  */
-function hideLoading(element = null, OriginalText = "") {
+function hideLoading(element = null, originalText = "") {
     if (element) {
         element.disabled = false;
-        element.textContent = OriginalText;
+        // odn't set textContent for select elements - they use innerHTML options
+        if (element.tagName !== "SELECT") {
+            element.textContent = originalText;
+        }
     }
     AppState.isLoading = false;
 }
@@ -185,10 +189,18 @@ async function loadServiceTypes() {
         showLoading(Elements.serviceSelect, "Loading services . . .");
 
         const endpoint = CONFIG.ENDPOINTS.SERVICES.replace(
-            "{businessId",
+            "{businessId}",
             CONFIG.BUSINESS_ID
         );
         const response = await apiRequest(endpoint);
+
+        console.log("API Response: ", response);
+        console.log("Service Types: ", response.serviceTypes);
+        console.log("Service Select Element: ", Elements.serviceSelect);
+        console.log(
+            "Service Select HTML before: ",
+            Elements.serviceSelect.innerHTML
+        );
 
         AppState.serviceTypes = response.serviceTypes || [];
 
@@ -201,6 +213,11 @@ async function loadServiceTypes() {
             option.textContent = service;
             Elements.serviceSelect.appendChild(option);
         });
+
+        console.log(
+            "Service Select HTML after: ",
+            Elements.serviceSelect.innerHTML
+        );
 
         hideLoading(Elements.serviceSelect);
     } catch (error) {
@@ -230,12 +247,12 @@ async function loadAvailableDates() {
         AppState.availableDates = response.availableDates || [];
 
         // Populate date dropdown
-        Elements.dataSelect.innerHTML =
+        Elements.dateSelect.innerHTML =
             '<option value="">Choose a date</option>';
 
         if (AppState.availableDates.length === 0) {
             Elements.dateSelect.innerHTML =
-                'option value="">No dates available</option>';
+                '<option value="">No dates available</option>';
             showError(
                 "No available dates found for the next 30 days. Please contact us directly."
             );
@@ -445,29 +462,6 @@ function handleServiceSelection(event) {
 }
 
 /**
- * Handle data selection
- */
-function handleDateSelection(event) {
-    const selectedDate = event.target.value;
-    AppState.selectedDate = selectedDate;
-
-    if (selectedDate) {
-        // load available dates for this service
-        loadTimeSlots(selectedDate);
-        hideMessage(); // clear any previous error messages
-    } else {
-        // reset form if no service selected
-        Elements.dateSelect.disabled = true;
-        Elements.dateSelect.innerHTML =
-            '<option value="">Select a service first</option>';
-        resetTimeSlots();
-        AppState.selectedDate = null;
-    }
-
-    validateForm();
-}
-
-/**
  * Handle date selection
  */
 function handleDateSelection(event) {
@@ -570,6 +564,103 @@ async function handleFormSubmission(event) {
 
 // INITIALIZATION
 // =======================================
+/**
+ * Cache DOM elements
+ */
+function cacheElements() {
+    Elements.form = document.getElementById("booking-form");
+    Elements.serviceSelect = document.getElementById("service-type");
+    Elements.dateSelect = document.getElementById("booking-date");
+    Elements.timeSlots = document.getElementById("time-slots");
+    Elements.submitBtn = document.getElementById("submit-btn");
+    Elements.submitText = document.getElementById("submit-text");
+    Elements.submitSpinner = document.getElementById("submit-spinner");
+    Elements.loadingOverlay = document.getElementById("loading-overlay");
+    Elements.messageContainer = document.getElementById("message-container");
+    Elements.errorMessage = document.getElementById("error-message");
+    Elements.successMessage = document.getElementById("success-message");
+    Elements.progressBar = document.querySelector(".bg-primary.h-2");
+}
+
+/**
+ * Attach event listeners
+ */
+function attachEventListeners() {
+    // service selection
+    Elements.serviceSelect.addEventListener("change", handleServiceSelection);
+
+    // date selection
+    Elements.dateSelect.addEventListener("change", handleDateSelection);
+
+    // time slot selection
+    Elements.timeSlots.addEventListener("change", handleTimeSlotSelection);
+
+    // form submission
+    Elements.form.addEventListener("submit", handleFormSubmission);
+
+    // Form validation on input
+    Elements.form.addEventListener("input", validateForm);
+
+    // close messages when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!Elements.messageContainer.contains(event.target)) {
+            // don't auto-hide success messages
+            if (!Elements.successMessage.classList.contains("hidden")) return;
+            hideMessage();
+        }
+    });
+}
+
+/**
+ * Initialize the booking form
+ */
+async function initializeBookingForm() {
+    try {
+        console.log("Initializing booking form. . .");
+
+        // cache DOM elements
+        cacheElements();
+
+        // check if all required elements exist
+        const requiredElements = Object.entries(Elements);
+        const missingElements = requiredElements.filter(
+            ([key, element]) => !element
+        );
+
+        if (missingElements.length > 0) {
+            console.error(
+                "Missing requried DOM elements: ",
+                missingElements.map(([key]) => key)
+            );
+            return;
+        }
+
+        // attach event listeners
+        attachEventListeners();
+
+        // load initial data
+        await loadServiceTypes();
+
+        // iniial form validation
+        validateForm();
+
+        console.log("Booking form initialized successfully!");
+    } catch (error) {
+        console.error("Failed to initialize booking form: ", error);
+        showError(
+            "Failed to initialize booking form. Please refresh the page."
+        );
+    }
+}
 
 // START THE APP
 // =======================================
+
+/**
+ * initialize when DOM is ready
+ */
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeBookingForm);
+} else {
+    initializeBookingForm();
+}
