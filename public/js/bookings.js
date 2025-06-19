@@ -89,7 +89,6 @@ function showLoading(element = null, text = "Loading. . .") {
 function hideLoading(element = null, originalText = "") {
     if (element) {
         element.disabled = false;
-        // odn't set textContent for select elements - they use innerHTML options
         if (element.tagName !== "SELECT") {
             element.textContent = originalText;
         }
@@ -314,10 +313,8 @@ async function loadTimeSlots(selectedDate) {
                 input.disabled = false;
                 label.classList.remove("cursor-not-allowed");
                 label.classList.add("cursor-pointer");
-                slotDiv.classList.remove(
-                    "peer-disabled:bg-gray-50",
-                    "peer-disabled:cursor-not-allowed"
-                );
+
+                // update text colors for enabled state
                 slotTitle.classList.remove("text-gray-400");
                 slotTitle.classList.add("text-gray-900");
                 slotTime.classList.remove("text-gray-400");
@@ -327,10 +324,8 @@ async function loadTimeSlots(selectedDate) {
                 input.disabled = true;
                 label.classList.add("cursor-not-allowed");
                 label.classList.remove("cursor-pointer");
-                slotDiv.classList.add(
-                    "peer-disabled:bg-gray-50",
-                    "peer-disabled:cursor-not-allowed"
-                );
+
+                // keep text colors for disabled state
                 slotTitle.classList.add("text-gray-400");
                 slotTitle.classList.remove("text-gray-900");
                 slotTime.classList.add("text-gray-400");
@@ -352,7 +347,7 @@ async function loadTimeSlots(selectedDate) {
             } available`;
         }
     } catch (error) {
-        console.error("Failed to load time slots");
+        console.error("Failed to load time slots", error);
         showError(
             "Failed to laod available time slots. Please try selected a different date."
         );
@@ -379,10 +374,8 @@ function resetTimeSlots() {
         input.checked = false;
         label.classList.add("cursor-not-allowed");
         label.classList.remove("cursor-pointer");
-        slotDiv.classList.add(
-            "peer-disabled:bg-gray-50",
-            "peer-disabled:cursor-not-allowed"
-        );
+
+        // reset to disabled text colors
         slotTitle.classList.add("text-gray-400");
         slotTitle.classList.remove("text-gray-900");
         slotTime.classList.add("text-gray-400");
@@ -483,6 +476,8 @@ function handleDateSelection(event) {
  */
 function handleTimeSlotSelection(event) {
     AppState.selectedTimeSlot = event.target.value;
+    console.log("Time slot selected: ", AppState.selectedTimeSlot);
+
     validateForm();
 }
 
