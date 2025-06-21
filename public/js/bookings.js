@@ -481,6 +481,89 @@ function handleTimeSlotSelection(event) {
     validateForm();
 }
 
+/**
+ * show confirmation view w/ booking deets
+ */
+function showConfirmation(bookingData, response) {
+    // hide the form & show confirmation
+    Elements.form.style.display = "none";
+    Elements.confirmationContainer.classList.remove("hidden");
+
+    // hide any messages
+    hideMessage();
+
+    // update progress to complete
+    updateProgress(3);
+
+    // format time slot for display
+    const timeSlotDisplay = {
+        morning: "Morning (9:00 AM - 12:00 PM)",
+        afternoon: "Afternoon (12:00 PM - 5:00 PM",
+        evening: "Evening (5:00 PM - 8:00 PM",
+    };
+
+    // populate confirmation details
+    document.getElementById(
+        "confirmation-number"
+    ).textContent = `#${response.booking.id}`;
+    document.getElementById("confirmation-service").textContent =
+        bookingData.service_type;
+    document.getElementById("confirmation-date").textContent =
+        formatDateForDisplay(bookingData.booking_date);
+    document.getElementById("confirmation-time").textContent =
+        timeSlotDisplay[bookingData.time_slot];
+    document.getElementById("confirmation-name").textContent =
+        bookingData.customer_name;
+    document.getElementById("confirmation-email").textContent =
+        bookingData.customer_email;
+    document.getElementById("confirmation-phone").textContent =
+        bookingData.customer_phone || "Not provided";
+
+    // handle address display
+    const addressContainer = document.getElementById(
+        "confirmation-address-container"
+    );
+    if (bookingData.customer_address) {
+        addressContainer.style.display = "block";
+        document.getElementById("confirmation-address").textContent =
+            bookingData.customer_address;
+    } else {
+        addressContainer.style.display = "none";
+    }
+
+    // scroll to top
+    window.scrollTop({ top: 0, behavior: "smooth" });
+}
+
+/**
+ * reset to booking form
+ */
+function showBookingForm() {
+    // show form and hide confirmation
+    Elements.form.style.display = "block";
+    Elements.confirmationContainer.classList.add("hidden");
+
+    // reset form
+    Elements.form.reset();
+    AppState.selectedService = null;
+    AppState.selectedDate = null;
+    AppState.selectedTimeSlot = null;
+    Elements.dateSelect.disabled = true;
+    Elements.dateSelect.innerHTML =
+        '<option value="">Select a service first</option>';
+    resetTimeSlots();
+    updateProgress(1);
+
+    // reload service types
+    loadServiceTypes();
+
+    // hide any messages
+    hideMessage();
+
+    // scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 // FORM SUBMISSION
 // =======================================
 
@@ -524,13 +607,15 @@ async function handleFormSubmission(event) {
         });
 
         // success msg
-        showSuccess(
-            `Booking created successfully! Your appointment is scheduled for ${formatDateForDisplay(
-                bookingData.booking_date
-            )} during the ${
-                bookingData.time_slot
-            }. You'll receive a confirmation email shortly.`
-        );
+        // showSuccess(
+        //     `Booking created successfully! Your appointment is scheduled for ${formatDateForDisplay(
+        //         bookingData.booking_date
+        //     )} during the ${
+        //         bookingData.time_slot
+        //     }. You'll receive a confirmation email shortly.`
+        // );
+        // show confirmation view
+        showConfirmation(bookingData, response);
 
         // reset form
         Elements.form.reset();
@@ -575,6 +660,9 @@ function cacheElements() {
     Elements.errorMessage = document.getElementById("error-message");
     Elements.successMessage = document.getElementById("success-message");
     Elements.progressBar = document.querySelector(".bg-primary.h-2");
+    Elements.confirmationContainer = document.getElementById(
+        "confirmation-container"
+    );
 }
 
 /**
@@ -595,6 +683,12 @@ function attachEventListeners() {
 
     // Form validation on input
     Elements.form.addEventListener("input", validateForm);
+
+    // book another service button
+    const bookAnotherBtn = document.getElementById("book-another-btn");
+    if (bookAnotherBtn) {
+        bookAnotherBtn.addEventListener("click", showBookingForm);
+    }
 
     // close messages when clicking outside
     document.addEventListener("click", (e) => {

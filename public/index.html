@@ -147,7 +147,8 @@
                             *</label>
                         <div id="time-slots" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <label for="morning-slot" class="relative cursor-not-allowed">
-                                <input type="radio" name="time_slot" value="morning" id="morning-slot" disabled class="sr-only peer">
+                                <input type="radio" name="time_slot" value="morning" id="morning-slot" disabled
+                                    class="sr-only peer">
                                 <div
                                     class="border-2 border-gray-200 rounded-lg p-4 text-center peer-checked:border-primary peer-checked:bg-blue-50 peer-disabled:bg-gray-50 peer-disabled:cursor-not-allowed transition-all duration-200">
                                     <div class="font-medium text-gray-400">Morning</div>
@@ -156,7 +157,8 @@
                             </label>
 
                             <label for="afternoon-slot" class="relative cursor-not-allowed">
-                                <input type="radio" name="time_slot" value="afternoon" id="afternoon-slot" disabled class="sr-only peer">
+                                <input type="radio" name="time_slot" value="afternoon" id="afternoon-slot" disabled
+                                    class="sr-only peer">
                                 <div
                                     class="border-2 border-gray-200 rounded-lg p-4 text-center peer-checked:border-primary peer-checked:bg-blue-50 peer-disabled:bg-gray-50 peer-disabled:cursor-not-allowed transition-all duration-200">
                                     <div class="font-medium text-gray-400">Afternoon</div>
@@ -165,7 +167,8 @@
                             </label>
 
                             <label for="evening-slot" class="relative cursor-not-allowed">
-                                <input type="radio" name="time_slot" value="evening" id="evening-slot" disabled class="sr-only peer">
+                                <input type="radio" name="time_slot" value="evening" id="evening-slot" disabled
+                                    class="sr-only peer">
                                 <div
                                     class="border-2 border-gray-200 rounded-lg p-4 text-center peer-checked:border-primary peer-checked:bg-blue-50 peer-disabled:bg-gray-50 peer-disabled:cursor-not-allowed transition-all duration-200">
                                     <div class="font-medium text-gray-400">Evening</div>
@@ -238,6 +241,110 @@
                 </div>
             </div>
         </form>
+
+        <!-- booking confirmation -->
+        <div id="confirmation-container" class="hidden space-y-6">
+            <!-- success header -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl font-bold text-green-900">Booking Confirmed</h2>
+                        <p class="text-green-700">Your appointment has been successfully scheduled</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- booking details card -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Booking Details</h3>
+                <div class="border rounded-lg p-4 bg-gray-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Confirmation Number</p>
+                            <p class="font-mono font-bold text-lg" id="confirmation-number">#12345</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Service Type</p>
+                            <p class="font-medium" id="confirmation-service">Water Softener Installation</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Date</p>
+                            <p class="font-medium" id="confirmation-date">Monday, December 2, 2024</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Time</p>
+                            <p class="font-medium" id="confirmation-time">Morning (9:00 AM - 12:00 PM)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- customer info card -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Your Information</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Name:</span>
+                        <span class="font-medium" id="confirmation-name">John Doe</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Email:</span>
+                        <span class="font-medium" id="confirmation-phone">john@example.com</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Phone:</span>
+                        <span class="font-medium" id="confirmation-phone">(555) 747-1234</span>
+                    </div>
+                    <div id="confirmation-address-container" class="pt-2 border-l">
+                        <p class="text-gray-600 mb-1">Service Address:</p>
+                        <p class="font-medium" id="confirmation-address">123 Main St, City, State 12345</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- next steps card -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 class="text-lg font-bold text-blue-900 mb-3">What's Next?</h3>
+                <ul class="space-y-2 text-blue-700">
+                    <li class="flex items-start">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                        <span>A confirmation email has been sent to your email address</span>
+                    </li>
+                    <li class="flex items-start">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                        <span>You'll receive a reminder 24 hours before your appointment</span>
+                    </li>
+                    <li class="flex items-start">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                        <span>Our technician will call 30 minutes before arrival</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- active buttons -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button type="button" id="book-another-btn"
+                        class="flex-1 px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                        >Book Another Service</button>
+                    <button type="button" onclick="window.print()"
+                        class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">Print
+                        Confirmation</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Loading overlay -->
         <div id="loading-overlay"
